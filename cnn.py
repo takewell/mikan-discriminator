@@ -19,9 +19,13 @@ data_path = "data"
 for label in os.listdir(data_path):
   dir = data_path + "/" + label
   for filename in os.listdir(dir):
-    label_list.append(label)
+    if label == "failure":
+      label_list.append("0")
+    else:
+      label_list.append("1")
+
     image_path = dir + "/" + filename
-    image = np.array(Image.open(image_path).convert("L").resize((244,244)))
+    image = np.array(Image.open(image_path).resize((244,244)))
     image_list.append(image)
 
 image_list = np.array(image_list)
@@ -33,5 +37,34 @@ train_data = train_data.reshape(-1, 244, 244, 3)
 test_data = test_data.reshape(-1, 244, 244, 3)
 
 input_shape = train_data[0].shape
+batch_size = 128
+epochs = 5
+kernel_size = (4,4)
 
-print(input_shape)
+model = Sequential()
+
+model.add(Conv2D(filters=32, kernel_size=kernel_size, input_shape=input_shape, activation="relu"))
+model.add(Conv2D(filters=64, kernel_size=kernel_size, activation="relu"))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.2))
+model.add(Conv2D(filters=64, kernel_size=kernel_size, activation="relu"))
+model.add(Conv2D(filters=64, kernel_size=kernel_size, activation="relu"))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
+model.add(Dense(64, activation="relu"))
+model.add(Flatten())
+model.add(Dense(2, activation="softmax"))
+model.summary()
+
+model.compile(
+    optimizer='adadelta',
+    loss='categorical_crossentropy',
+    metrics=['categorical_accuracy']
+)
+
+model.fit(train_data, train_label, batch_size=batch_size, epochs=epochs)
+
+scores = model.evaluate(test_data, test_label, verbose=1)
+
+print('Test loss:', scores[0])
+print('Test accuracy:', scores[1])
