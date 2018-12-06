@@ -37,7 +37,7 @@ train_data = train_data.reshape(-1, 244, 244, 3)
 test_data = test_data.reshape(-1, 244, 244, 3)
 
 input_shape = train_data[0].shape
-batch_size = 128
+batch_size = 64
 epochs = 5
 kernel_size = (4,4)
 
