@@ -25,7 +25,9 @@ for label in os.listdir(data_path):
       label_list.append("1")
 
     image_path = dir + "/" + filename
-    image = np.array(Image.open(image_path).resize((244,244)))
+    width, height = 1280, 960
+    crop_args = (240, 80, width - 240, height - 80)
+    image = np.array(Image.open(image_path).crop(crop_args).resize((244,244)))
     image_list.append(image)
 
 image_list = np.array(image_list)
